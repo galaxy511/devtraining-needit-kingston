@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element extends="task" label="NeedIt Task" max_length="40" name="x_58872_needit_needit_task" type="collection">
+        <element attributes="edge_encryption_enabled=true" label="需求3" max_length="255" name="u_string_full_utf8_1" type="string_full_utf8"/>
+    </element>
+</database>
