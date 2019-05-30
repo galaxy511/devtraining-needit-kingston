@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sysauto_script">
+    <sysauto_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <condition/>
+        <conditional>false</conditional>
+        <name>Generate Random NeedIt Records</name>
+        <run_as display_value="System Administrator">6816f79cc0a8016401c5a33be04be441</run_as>
+        <run_as_tz/>
+        <run_dayofmonth>1</run_dayofmonth>
+        <run_dayofweek>1</run_dayofweek>
+        <run_period/>
+        <run_start>2019-05-20 03:19:50</run_start>
+        <run_time>1969-12-31 16:00:00</run_time>
+        <run_type>on_demand</run_type>
+        <script><![CDATA[//Number of NeedIt records to create
+	var recordsToMake = 30;
+	
+	// Declare and initialize variables used in the script
+	var genNIRec;
+	var i;
+	var tableName = "x_58872_needit_needit";
+	var requestTypeArray = ["facilities","hr","legal"];
+	var selectRequestType = "";
+	var selectWhatNeeded = 3;
+	var pickDate = 1;
+	// var requestedForArray = [{"name":"Fred Luddy","email":"fred.luddy@example.com"},{"name":"Beth Anglin","email":"beth.anglin@example.com"},{"name":"System Administrator","email":"admin@example.com"}];
+	//var requestedForArray = [{"name":"Power Huang(文杰)","email":"max_tseng@gss.com.tw"},{"name":"David Lin(大為)","email":"max_tseng@gss.com.tw"},{"name":"Young Huang(堯昌)","email":"max_tseng@gss.com.tw"}];
+	//var requestedForArray = [{"name":"Bruce Chen(陳○雄)","email":"max_tseng@gss.com.tw"},{"name":"Anrita Ho(何○雲)","email":"max_tseng@gss.com.tw"},{"name":"Miranda Liu(劉○雯)","email":"max_tseng@gss.com.tw"}];
+//var requestedForArray = [{"name":"Kevin Lin(林○勳)","email":"max_tseng@gss.com.tw"},{"name":"Max Tseng(曾○大)","email":"max_tseng@gss.com.tw"},{"name":"Albert Wang(王○浩)","email":"max_tseng@gss.com.tw"}];
+// var requestedForArray = [{"name":"Fred Fang(方○毅)","email":"max_tseng@gss.com.tw"},{"name":"Tim Su(蘇○傑)","email":"max_tseng@gss.com.tw"},{"name":"Miller Kuo(郭○志)","email":"max_tseng@gss.com.tw"}];
+// var requestedForArray = [{"name":"Cindy Liao(廖○鈞)","email":"max_tseng@gss.com.tw"},{"name":"I-fan Huang(黃○凡))","email":"max_tseng@gss.com.tw"},{"name":"Irene Chou(周○伶)","email":"max_tseng@gss.com.tw"}];
+//var requestedForArray = [{"name":"Kevin Tang(唐○恒)","email":"max_tseng@gss.com.tw"},{"name":"Frank Huang(黃○逸)","email":"max_tseng@gss.com.tw"},{"name":"Frank Huang(黃○逸)","email":"max_tseng@gss.com.tw"}];
+//var requestedForArray = [{"name":"Ifan Huang(黃○凡)","email":"max_tseng@gss.com.tw"},{"name":"Howard Hung(洪○昇)","email":"max_tseng@gss.com.tw"},{"name":"George Chiou(邱○貴)","email":"max_tseng@gss.com.tw"}];
+//var requestedForArray = [{"name":"Dylan Lu(呂○龍)","email":"max_tseng@gss.com.tw"},{"name":"Ben Chang(張○嘉)","email":"max_tseng@gss.com.tw"},{"name":"Maggie Liu(劉○萍)","email":"max_tseng@gss.com.tw"}];
+var requestedForArray = [{"name":"Sola Chen(陳○馳))","email":"max_tseng@gss.com.tw"},{"name":"Cindy Liao(廖○鈞)","email":"max_tseng@gss.com.tw"},{"name":"Miller Kuo(郭○志)","email":"max_tseng@gss.com.tw"}];
+	var pickUser = 10;
+		
+	
+	//For loop to create records
+		for (i = 0; i < recordsToMake; i++) {
+			
+			//Create an empty record for the NeedIt table
+			genNIRec = new GlideRecord(tableName);
+			genNIRec.newRecord();
+			
+	
+			//Select a random value from the requestType array and set the Request Type field value (choice)
+			selectRequestType = requestTypeArray[(Math.floor(Math.random() * 3))];
+			genNIRec.setValue("u_request_type",selectRequestType);
+			
+			
+			//Set the What needed field value (choice) from the Request Type and either 1 or 2
+			selectWhatNeeded = (Math.floor(Math.random()*2) +1);		
+			genNIRec.setValue("u_what_needed",selectRequestType + selectWhatNeeded);
+			
+			//Set the Short description field value (string)
+			genNIRec.setValue("short_description", "190522自動化創建 NeedIt 需求: " + selectRequestType + ", " + selectRequestType + selectWhatNeeded);
+			
+			//Set the When needed field value (date/time) to a date between six months from now and six months ago
+			var rightNow = new GlideDateTime();		
+			pickDate = (Math.floor(Math.random() * 366) - 182);
+			rightNow.addDaysUTC(pickDate);		
+			genNIRec.setValue("u_when_needed",rightNow.getDate());
+			
+			
+			//Set the Requested for field value (reference) by selecting a random user from requestedForArray.
+			//Also set the Requested for email field value (string).  The reference field cannot be set in a scoped app
+			//using the setValue method unless using the sys_id to set the field value.  To set by display name, use 
+			//the GlideElement setDisplayValue method.  gr.<field_name>.setDisplayValue(<value>). 
+			pickUser = (Math.floor(Math.random()*3));
+			genNIRec.u_requested_for.setDisplayValue(requestedForArray[pickUser].name);
+			genNIRec.setValue("u_requested_for_email",requestedForArray[pickUser].email.toString());
+			
+			
+			//Set the Priority field value (choice) to a random value
+			genNIRec.setValue("priority",(Math.floor(Math.random()*5)+1));
+			
+			//Set the State field value (choice) to Requested
+			genNIRec.setValue("state",13);
+			
+			//Insert the new NeedIt record into the table
+			genNIRec.insert();
+	}]]></script>
+        <sys_class_name>sysauto_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-05-20 03:20:31</sys_created_on>
+        <sys_id>7738dcd13729b7004dd17e5004990e55</sys_id>
+        <sys_mod_count>15</sys_mod_count>
+        <sys_name>Generate Random NeedIt Records</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sysauto_script_7738dcd13729b7004dd17e5004990e55</sys_update_name>
+        <sys_updated_by>bruce</sys_updated_by>
+        <sys_updated_on>2019-05-22 04:17:10</sys_updated_on>
+        <upgrade_safe>false</upgrade_safe>
+    </sysauto_script>
+</record_update>
